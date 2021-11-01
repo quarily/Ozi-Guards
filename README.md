@@ -8,3 +8,4 @@
 
 - Tüm hatalarını tamamladım sanırım başka hata görürsem yapacağım, düzenlicem.
 
+![image](https://user-images.githubusercontent.com/92666466/139727759-dbf9ef2b-5d9b-46fe-b96d-6e95d2d07a0b.png)
