@@ -1,0 +1,1 @@
+Bot yeniden yapılıp paylasılıcaktır.
