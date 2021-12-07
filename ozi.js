@@ -288,12 +288,12 @@ client2.on("guildMemberUpdate", async (oldMember, newMember) => {
   const uyecik = newMember.guild.members.cache.get(log.executor.id);
   uyecik.roles.set([ayarlar.karantinarol]).catch(err => {})
     
-  let channel = client3.channels.cache.get(ayarlar.defenderlog)
+  let channel = client2.channels.cache.get(ayarlar.defenderlog)
   if (!channel) return console.log('İsim Koruma Logu Yok!');
   const ozi = new Discord.MessageEmbed()
   .setColor(ayarlar.color)
-    .setThumbnail(log.executor.avatarURL({ dynamic: true }))
-.setDescription(`${log.executor} üyesi izinsiz isim güncelledi ve kullanıcıyı karantina attım.\n─────────────────────\nYetkili: (${log.executor} - \`${log.executor.id}\`)\nİsim: \`${oldMember.nickname}\` - \`${newMember.nickname}\`\n─────────────────────\nTarih: \`${moment(Date.now() + (1000*60*60*3)).format("LLL")}\``)
+  .setThumbnail(log.executor.avatarURL({ dynamic: true }))
+  .setDescription(`${log.executor} üyesi izinsiz isim güncelledi ve kullanıcıyı karantina attım.\n─────────────────────\nYetkili: (${log.executor} - \`${log.executor.id}\`)\nİsim: \`${oldMember.nickname}\` - \`${newMember.nickname}\`\n─────────────────────\nTarih: \`${moment(Date.now() + (1000*60*60*3)).format("LLL")}\``)
   channel.send(`@here`, {embed: ozi}).catch(e => { })	
 return;
       }
