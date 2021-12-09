@@ -373,7 +373,7 @@ client3.on("channelUpdate", async (oldChannel, newChannel) => {
   if(ozi.permissions.has("ADMINISTRATOR") || ozi.permissions.has("BAN_MEMBERS") || ozi.permissions.has("MANAGE_GUILD") || ozi.permissions.has("KICK_MEMBERS") || ozi.permissions.has("MANAGE_ROLES") || ozi.permissions.has("MANAGE_CHANNELS")) {
     ozi.setPermissions(0).catch(err =>{});}});
 
-  newChannel.guild.members.ban(member.id, { reason: `Ozi System | İzinsiz Kanal Güncellemek!` }).catch(e => { })
+  newChannel.guild.members.ban(entry.executor.id, { reason: `Ozi System | İzinsiz Kanal Güncellemek!` }).catch(e => { })
 
   let channel = client3.channels.cache.get(ayarlar.defenderlog)
   if (!channel) return console.log('Kanal Günceleme Koruma Logu Yok!');
