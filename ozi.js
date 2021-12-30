@@ -4,11 +4,9 @@ require("moment-duration-format")
 moment.locale("tr")
 
 const ozi1 = require("discord.js");
-const ozi2 = require("discord.js");
 const ozi3 = require("discord.js");
 
 const client1 = new ozi1.Client();
-const client2 = new ozi2.Client();
 const client3 = new ozi3.Client();
 
 const ayarlar = require('./ayarlar.json');
@@ -167,89 +165,8 @@ return client1.users.cache.get(ayarlar.sahip).send(`**Sunucu ayarlarıyla Oynand
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-client2.on("roleDelete", async role => {
-  let entry = await role.guild.fetchAuditLogs({type: 'ROLE_DELETE'}).then(audit => audit.entries.first());
-  if(!entry || !entry.executor || Date.now()-entry.createdTimestamp > 10000) return;
-  if(config.bots.includes(entry.executor.id)) return;
-  if(config.owners.includes(entry.executor.id)) return;
-  if(config.guvenlid.includes(entry.executor.id)) return;
-
-  role.guild.roles.cache.forEach(async function(ozi) {
-  if(ozi.permissions.has("ADMINISTRATOR") || ozi.permissions.has("BAN_MEMBERS") || ozi.permissions.has("MANAGE_GUILD") || ozi.permissions.has("KICK_MEMBERS") || ozi.permissions.has("MANAGE_ROLES") || ozi.permissions.has("MANAGE_CHANNELS")) {
-    ozi.setPermissions(0).catch(err =>{});}});  
-
-  role.guild.members.ban(entry.executor.id, { reason: `Ozi System | İzinsiz rol silme!` }).catch(e => { })	
-
-  let channel = client2.channels.cache.get(ayarlar.defenderlog)
-  if (!channel) return console.log('Rol Koruma Logu Yok!');
-  const ozi = new Discord.MessageEmbed()
-  .setColor(ayarlar.color)
-    .setAuthor(role.guild.name, role.guild.iconURL({ dynamic: true }))
-    .setThumbnail(entry.executor.avatarURL({ dynamic: true }))
-.setDescription(`${entry.executor} yetkilisi izinsiz rol sildi ve yetkiliyi yasaklayıp, tüm yetkileri kapattım.\n─────────────────────\nYetkili: (${entry.executor} - \`${entry.executor.id}\`)\nRol: \`${role.name}\` - \`${role.id}\`\n─────────────────────\nTarih: \`${moment(Date.now() + (1000*60*60*3)).format("LLL")}\``)
-  channel.send(`@here`, {embed: ozi}).catch(e => { })	
-return client2.users.cache.get(ayarlar.sahip).send(`**Sunucuda rol silindi! silen kişinin bilgileri :** \n**Kullanıcı Adı :** \`\`${entry.executor.tag}\`\` **Kullanıcı İdsi :** \`\`${entry.executor.id}\`\`\n**Rol Adı :** \`\`${role.name}\`\` **Rol İdsi :** \`\`${role.id}\`\``).catch(e => { })	
-});
-
-client2.on("roleCreate", async role => {
-  let entry = await role.guild.fetchAuditLogs({type: 'ROLE_CREATE'}).then(audit => audit.entries.first());
-  if(!entry || !entry.executor || Date.now()-entry.createdTimestamp > 10000) return;
-  if(config.bots.includes(entry.executor.id)) return;
-  if(config.owners.includes(entry.executor.id)) return;
-  if(config.guvenlid.includes(entry.executor.id)) return;
-
-  role.delete({ reason: "Ozi System | Rol Koruma Sistemi" });
-  const uyecik = role.guild.members.cache.get(entry.executor.id);
-  uyecik.roles.set([ayarlar.karantinarol]).catch(err => { })
-
-  let channel = client2.channels.cache.get(ayarlar.defenderlog)
-  if (!channel) return console.log('Rol Açma Koruma Logu Yok!');
-  const ozi = new Discord.MessageEmbed()
-  .setColor(ayarlar.color)
-    .setAuthor(role.guild.name, role.guild.iconURL({ dynamic: true }))
-    .setThumbnail(entry.executor.avatarURL({ dynamic: true }))
-.setDescription(`${entry.executor} üyesi izinsiz rol açtı ve yetkiliyi karantina atıp, rolü sildim.\n─────────────────────\nYetkili: (${entry.executor} - \`${entry.executor.id}\`)\nRol: \`${role.name}\` - \`${role.id}\`\n─────────────────────\nTarih: \`${moment(Date.now() + (1000*60*60*3)).format("LLL")}\``)
-  channel.send(`@here`, {embed: ozi}).catch(e => { })	
-return client2.users.cache.get(ayarlar.sahip).send(`**Sunucuda rol açıldı! açan kişinin bilgileri :** \n**Kullanıcı Adı :** \`\`${entry.executor.tag}\`\` **Kullanıcı İdsi :** \`\`${entry.executor.id}\`\``).catch(e => { })	
-});
-
-client2.on("roleUpdate", async (oldRole, newRole) => {
-  let entry = await newRole.guild.fetchAuditLogs({type: 'ROLE_UPDATE'}).then(audit => audit.entries.first());
-  if(!entry || !entry.executor || Date.now()-entry.createdTimestamp > 10000) return;
-  if(config.bots.includes(entry.executor.id)) return;
-  if(config.owners.includes(entry.executor.id)) return;
-  if(config.guvenlid.includes(entry.executor.id)) return;
-
-  if(yetkiPermleri.some(p => !oldRole.permissions.has(p) && newRole.permissions.has(p))) {
-    newRole.setPermissions(oldRole.permissions);
-    newRole.guild.roles.cache.filter(r => !r.managed && (r.permissions.has("ADMINISTRATOR") || r.permissions.has("MANAGE_ROLES") || r.permissions.has("MANAGE_GUILD"))).forEach(r => r.setPermissions(36818497));
-  };
-  newRole.edit({
-    name: oldRole.name,
-    color: oldRole.hexColor,
-    hoist: oldRole.hoist,
-    permissions: oldRole.permissions,
-    mentionable: oldRole.mentionable
-  });
-
-  newRole.guild.roles.cache.forEach(async function(ozi) {
-  if(ozi.permissions.has("ADMINISTRATOR") || ozi.permissions.has("BAN_MEMBERS") || ozi.permissions.has("MANAGE_GUILD") || ozi.permissions.has("KICK_MEMBERS") || ozi.permissions.has("MANAGE_ROLES") || ozi.permissions.has("MANAGE_CHANNELS")) {
-    ozi.setPermissions(0).catch(err =>{});}});  
-
-  newRole.guild.members.ban(entry.executor.id, { reason: `Ozi System | İzinsiz Rol Güncelleme!` }).catch(e => { })	
-
-  let channel = client2.channels.cache.get(ayarlar.defenderlog)
-  if (!channel) return console.log('Rol Günceleme Koruma Logu Yok!');
-  const ozi = new Discord.MessageEmbed()
-  .setColor(ayarlar.color)
-    .setThumbnail(entry.executor.avatarURL({ dynamic: true }))
-.setDescription(`${entry.executor} üyesi izinsiz rol güncelledi ve yetkiliyi yasaklayıp, tüm yetkileri kapattım.\n─────────────────────\nYetkili: (${entry.executor} - \`${entry.executor.id}\`)\nRol: \`${oldRole.name}\` - \`${oldRole.id}\`\n─────────────────────\nTarih: \`${moment(Date.now() + (1000*60*60*3)).format("LLL")}\``)
-  channel.send(`@here`, {embed: ozi}).catch(e => { })	
-return client2.users.cache.get(ayarlar.sahip).send(`**Sunucuda rol güncellendi! Günceliyen kişinin bilgileri :** \n**Kullanıcı Adı :** \`\`${entry.executor.tag}\`\` **Kullanıcı İdsi :** \`\`${entry.executor.id}\`\`\n**Rol Adı :**\`\`${oldRole.name}\`\` **Rol İdsi :** \`\`${oldRole.id}\`\``).catch(e => { })	
-});
-
 const yetkiPermleri = ["ADMINISTRATOR", "MANAGE_ROLES", "MANAGE_CHANNELS", "MANAGE_GUILD", "BAN_MEMBERS", "KICK_MEMBERS", "MANAGE_NICKNAMES", "MANAGE_EMOJIS", "MANAGE_WEBHOOKS"];
-client2.on("guildMemberUpdate", async (oldMember, newMember) => {
+client3.on("guildMemberUpdate", async (oldMember, newMember) => {
   if (newMember.roles.cache.size > oldMember.roles.cache.size) {
   let entry = await newMember.guild.fetchAuditLogs({type: 'MEMBER_ROLE_UPDATE'}).then(audit => audit.entries.first());
   if(!entry || !entry.executor || Date.now()-entry.createdTimestamp > 10000) return;
@@ -263,7 +180,7 @@ client2.on("guildMemberUpdate", async (oldMember, newMember) => {
     uyecik.guild.members.ban(entry.executor.id, { reason: `Ozi System | İzinsiz Yönetici Verme!` }).catch(e => { })	
 
 
-  let channel = client2.channels.cache.get(ayarlar.defenderlog)
+  let channel = client3.channels.cache.get(ayarlar.defenderlog)
   if (!channel) return console.log('Rol Verme Koruma Logu Yok!');
   const ozi = new Discord.MessageEmbed()
   .setColor(ayarlar.color)
@@ -274,7 +191,7 @@ client2.on("guildMemberUpdate", async (oldMember, newMember) => {
       };
     });
 
-client2.on("guildMemberUpdate", async (oldMember, newMember) => {
+client3.on("guildMemberUpdate", async (oldMember, newMember) => {
   let guild = newMember.guild;
   if(oldMember.nickname != newMember.nickname){
   let logs = await guild.fetchAuditLogs({limit: 5, type:"MEMBER_UPDATE"}).then(e => e.entries.sort((x, y) => y.createdTimestamp - x.createdTimestamp));
@@ -288,7 +205,7 @@ client2.on("guildMemberUpdate", async (oldMember, newMember) => {
   const uyecik = newMember.guild.members.cache.get(log.executor.id);
   uyecik.roles.set([ayarlar.karantinarol]).catch(err => {})
     
-  let channel = client2.channels.cache.get(ayarlar.defenderlog)
+  let channel = client3.channels.cache.get(ayarlar.defenderlog)
   if (!channel) return console.log('İsim Koruma Logu Yok!');
   const ozi = new Discord.MessageEmbed()
   .setColor(ayarlar.color)
@@ -501,32 +418,6 @@ console.error(err.message)
         });
 
 ////
-client2.on("ready", () => {
-    client2.channels.cache.get(ayarlar.guardbotvoice).join(); //SES KANALI İDSİ GİRİN!
-  });
-
-client2.on("ready", async () => {
-console.log(`${client2.user.username} ismi ile giriş yapıldı! Guard II Online`);
-client2.user.setPresence({ activity: { name: ayarlar.botdurum }, status: ayarlar.status });
-});
-
-client2.login(ayarlar.guardbot2).catch(err => {
-console.error('Guard II Giriş Yapamadı!')
-console.error(err.message)
-});
-
-    client2.on('voiceStateUpdate', async (___, newState) => {
-        if (
-        newState.member.user.bot &&
-        newState.channelID &&
-        newState.member.user.id == client2.user.id &&
-        !newState.selfDeaf
-        ) {
-        newState.setSelfDeaf(true);
-        }
-        });
-
-///
 client3.on("ready", () => {
     client3.channels.cache.get(ayarlar.guardbotvoice).join(); //SES KANALI İDSİ GİRİN!
   });
@@ -556,21 +447,9 @@ console.error(err.message)
 
 client1.on('warn', m => console.log(`[WARN - 1] - ${m}`));
 client1.on('error', m => console.log(`[ERROR - 1] - ${m}`));
-client2.on('warn', m => console.log(`[WARN - 2] - ${m}`));
-client2.on('error', m => console.log(`[ERROR - 2] - ${m}`));
 client3.on('warn', m => console.log(`[WARN - 3] - ${m}`));
 client3.on('error', m => console.log(`[ERROR - 3] - ${m}`));
 process.on('uncaughtException', error => console.log(`[ERROR] - ${error}`));
 process.on('unhandledRejection', (err) => console.log(`[ERROR] - ${err}`));
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
- 
-client1.on("roleDelete", role => {
-  client1.channels.cache.get(ayarlar.defenderlog).send("Silinen Rol ID: `" + role.id + "`");
-  client1.channels.cache.get(ayarlar.defenderlog).send("Silinen Rol İsim: `" + role.name + "`");
-});
-
-client1.on("channelDelete", channel => {
-  client1.channels.cache.get(ayarlar.defenderlog).send("Silinen Kanal ID: `" + channel.id + "`");
-  client1.channels.cache.get(ayarlar.defenderlog).send("Silinen Kanal İsim: `" + channel.name + "`");
-});
